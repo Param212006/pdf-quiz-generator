@@ -207,7 +207,7 @@ document.getElementById('quizForm').addEventListener('submit', async (e) => {
     formData.append('file', fileInput.files[0]);
 
     try {
-        const response = await fetch('http://localhost:8000/api/generate-quiz', {
+        const response = await fetch('https://pdf-quiz-generator-b35g.onrender.com/api/generate-quiz', {
             method: 'POST',
             body: formData
         });
@@ -222,7 +222,7 @@ document.getElementById('quizForm').addEventListener('submit', async (e) => {
         }
     } catch (err) {
         console.error(err);
-        resultDiv.innerHTML = `<p style="color: var(--accent-red);">Could not connect to backend server at http://localhost:8000.</p>`;
+        resultDiv.innerHTML = `<p style="color: var(--accent-red);">Could not connect to backend server at Render.</p>`;
     } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = "Generate Interactive Quiz";
