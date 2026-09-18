@@ -2,7 +2,7 @@ import os
 import json
 import io
 import re
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
 from groq import Groq
@@ -25,12 +25,12 @@ def read_root():
     return {"status": "online", "message": "PDF Quiz Generator API is live!"}
 
 @app.post("/api/generate-quiz")
-async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(20)):
+async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(10)):
     if not client:
-        raise HTTPException(status_code=500, detail="GROQ_API_KEY environment variable is missing on Render.")
+        return {"status": "error", "message": "GROQ_API_KEY environment variable is missing on Render."}
 
     if not file.filename.endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
+        return {"status": "error", "message": "Only PDF files are supported."}
 
     try:
         pdf_bytes = await file.read()
@@ -42,10 +42,10 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
                 extracted_text += text + "\n"
 
         if not extracted_text.strip():
-            raise HTTPException(status_code=400, detail="Could not extract text from PDF.")
+            return {"status": "error", "message": "Could not extract text from PDF."}
 
-        prompt = f"""You are an educator. Generate exactly {num_questions} multiple-choice questions from this text.
-Return ONLY a valid JSON array. No markdown codeblocks, no extra text.
+        prompt = f"""Generate exactly {num_questions} multiple-choice questions from this text.
+Return ONLY a valid raw JSON array. Do not include markdown codeblocks, commentary, or backticks.
 
 Format:
 [
@@ -58,13 +58,13 @@ Format:
 ]
 
 Text:
-{extracted_text[:2000]}"""
+{extracted_text[:1500]}"""
 
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2,
-            max_tokens=2000
+            max_tokens=1500
         )
 
         raw_output = response.choices[0].message.content.strip()
@@ -75,9 +75,9 @@ Text:
             quiz_data = json.loads(clean_json)
             return {"status": "success", "quiz": quiz_data}
         else:
-            raise HTTPException(status_code=500, detail="Groq response did not contain a JSON array.")
+            return {"status": "error", "message": "AI response did not contain a valid JSON quiz array."}
 
     except json.JSONDecodeError as e:
-        raise HTTPException(status_code=500, detail=f"JSON Decode Error: {str(e)}")
+        return {"status": "error", "message": f"JSON Parse Error: {str(e)}"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Backend Exception: {str(e)}")
+        return {"status": "error", "message": f"Groq Error: {str(e)}"}
