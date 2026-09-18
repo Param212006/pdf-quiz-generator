@@ -19,7 +19,7 @@ app.add_middleware(
 )
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-client = Groq(api_api_key=GROQ_API_KEY) if GROQ_API_KEY else None
+client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 @app.get("/")
 def read_root():
@@ -71,7 +71,6 @@ Format:
 Text:
 {extracted_text[:2000]}"""
 
-        # Updated active Groq model identifier
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
