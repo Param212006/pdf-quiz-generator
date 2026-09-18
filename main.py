@@ -21,12 +21,6 @@ app.add_middleware(
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
-# Active production models on Groq
-ACTIVE_MODELS = [
-    "llama-3.3-70b-versatile",
-    "llama-3.1-8b-instant"
-]
-
 @app.get("/")
 def read_root():
     return {"status": "online", "message": "PDF Quiz Generator API is live!"}
@@ -77,13 +71,22 @@ Format:
 Text:
 {extracted_text[:2500]}"""
 
+        # Dynamically fetch available active models for this API key
+        available_models = []
+        try:
+            models_response = client.models.list()
+            available_models = [m.id for m in models_response.data if "whisper" not in m.id and "safeguard" not in m.id]
+        except Exception:
+            available_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "openai/gpt-oss-120b"]
+
         raw_output = None
         last_error = None
 
-        for model_name in ACTIVE_MODELS:
+        # Iterate through live active models
+        for model_id in available_models:
             try:
                 response = client.chat.completions.create(
-                    model=model_name,
+                    model=model_id,
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0.2,
                     max_tokens=2000
