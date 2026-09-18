@@ -34,17 +34,30 @@
             border: 1px solid var(--border-color);
         }
 
-        h1 {
-            color: #FFFFFF;
-            font-size: 2rem;
-            margin-bottom: 8px;
+        h1 { color: #FFFFFF; font-size: 2rem; margin-bottom: 8px; }
+        .subtitle { color: #94A3B8; margin-bottom: 25px; font-size: 0.95rem; }
+
+        .samples-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #0F172A;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
         }
 
-        .subtitle {
-            color: #94A3B8;
-            margin-bottom: 25px;
-            font-size: 0.95rem;
+        .sample-btn {
+            background: #334155;
+            color: #F8FAFC;
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin: 5px 5px 0 0;
+            transition: all 0.2s;
         }
+
+        .sample-btn:hover { background: var(--primary); border-color: var(--primary); }
 
         .upload-box {
             border: 2px dashed var(--border-color);
@@ -55,9 +68,7 @@
             background: #0F172A;
         }
 
-        input[type="file"] {
-            display: none;
-        }
+        input[type="file"] { display: none; }
 
         .file-label {
             display: inline-block;
@@ -70,15 +81,14 @@
             transition: all 0.2s;
         }
 
-        .file-label:hover {
-            background: #475569;
-        }
+        .file-label:hover { background: #475569; }
 
         #fileName {
             display: block;
             margin-top: 10px;
-            color: #94A3B8;
-            font-size: 0.85rem;
+            color: #22C55E;
+            font-size: 0.9rem;
+            font-weight: 600;
         }
 
         button.btn-primary {
@@ -94,9 +104,7 @@
             transition: background 0.2s;
         }
 
-        button.btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
+        button.btn-primary:hover { background-color: var(--primary-hover); }
 
         .question-card {
             margin-top: 20px;
@@ -118,14 +126,8 @@
             transition: all 0.2s;
         }
 
-        .option-item:hover {
-            border-color: var(--primary);
-        }
-
-        .option-item input {
-            margin-right: 12px;
-            accent-color: var(--primary);
-        }
+        .option-item:hover { border-color: var(--primary); }
+        .option-item input { margin-right: 12px; accent-color: var(--primary); }
 
         .option-item.correct {
             border-color: var(--accent-green) !important;
@@ -164,16 +166,24 @@
 <body>
 
 <div class="card">
-    <h1>PDF Quiz Generator</h1>
-    <p class="subtitle">Upload any document and test your knowledge instantly.</p>
+    <h1>AI Quiz Generator</h1>
+    <p class="subtitle">Select a pre-loaded sample PDF or upload your own document to generate a 20-question quiz.</p>
     
+    <div class="samples-container">
+        <p style="margin: 0 0 8px 0; font-size: 0.9rem; font-weight: 600;">Choose a Sample PDF:</p>
+        <button class="sample-btn" onclick="loadSamplePDF('sample.pdf', 'General Science')">📄 Science Sample</button>
+        <button class="sample-btn" onclick="loadSamplePDF('sample_ai.pdf', 'AI & Computing')">💻 AI & Tech Sample</button>
+        <button class="sample-btn" onclick="loadSamplePDF('sample_history.pdf', 'World History')">📜 History Sample</button>
+    </div>
+
     <form id="quizForm">
         <div class="upload-box">
-            <label for="pdfFile" class="file-label">Choose PDF File</label>
-            <input type="file" id="pdfFile" accept="application/pdf" required>
-            <span id="fileName">No file chosen</span>
+            <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: #94A3B8;">Or choose a PDF file from your device:</p>
+            <label for="pdfFile" class="file-label">Browse Device</label>
+            <input type="file" id="pdfFile" accept="application/pdf">
+            <span id="fileName">No file selected</span>
         </div>
-        <button type="submit" id="submitBtn" class="btn-primary">Generate Interactive Quiz</button>
+        <button type="submit" id="submitBtn" class="btn-primary">Generate 20-Question Quiz</button>
     </form>
 
     <div id="result" style="margin-top: 25px;"></div>
@@ -182,29 +192,47 @@
 
 <script>
 let currentQuestions = [];
+let selectedFileBlob = null;
 
 document.getElementById('pdfFile').addEventListener('change', (e) => {
     const file = e.target.files[0];
-    document.getElementById('fileName').innerText = file ? file.name : "No file chosen";
+    if (file) {
+        selectedFileBlob = file;
+        document.getElementById('fileName').innerText = `Device File: ${file.name}`;
+    }
 });
+
+async function loadSamplePDF(filePath, displayName) {
+    const fileNameSpan = document.getElementById('fileName');
+    fileNameSpan.innerText = `Loading ${displayName}...`;
+    try {
+        const response = await fetch(filePath);
+        const blob = await response.blob();
+        selectedFileBlob = new File([blob], filePath, { type: 'application/pdf' });
+        fileNameSpan.innerText = `Selected Sample: ${displayName}`;
+    } catch (err) {
+        alert("Sample PDF file not found on server.");
+        fileNameSpan.innerText = "No file selected";
+    }
+}
 
 document.getElementById('quizForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const fileInput = document.getElementById('pdfFile');
     const resultDiv = document.getElementById('result');
     const submitBtn = document.getElementById('submitBtn');
     const scoreBoard = document.getElementById('scoreBoard');
     
-    if (!fileInput.files[0]) return alert("Please select a PDF file.");
+    if (!selectedFileBlob) return alert("Please select a sample PDF or upload one from your device.");
 
     submitBtn.disabled = true;
-    submitBtn.innerText = "Extracting text and generating quiz...";
+    submitBtn.innerText = "Processing text & generating 20 questions...";
     resultDiv.innerHTML = "";
     scoreBoard.style.display = "none";
 
     const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
+    formData.append('file', selectedFileBlob);
+    formData.append('num_questions', 20);
 
     try {
         const response = await fetch('https://pdf-quiz-generator-b35g.onrender.com/api/generate-quiz', {
@@ -225,7 +253,7 @@ document.getElementById('quizForm').addEventListener('submit', async (e) => {
         resultDiv.innerHTML = `<p style="color: var(--accent-red);">Could not connect to backend server at Render.</p>`;
     } finally {
         submitBtn.disabled = false;
-        submitBtn.innerText = "Generate Interactive Quiz";
+        submitBtn.innerText = "Generate 20-Question Quiz";
     }
 });
 
@@ -284,7 +312,7 @@ function handleQuizSubmit(e) {
 
     const scoreBoard = document.getElementById('scoreBoard');
     scoreBoard.style.display = "block";
-    scoreBoard.innerHTML = `<h2>Your Score: ${score} / ${currentQuestions.length}</h2><p>${score === currentQuestions.length ? '🎉 Excellent performance!' : 'Review the explanations above to reinforce learning.'}</p>`;
+    scoreBoard.innerHTML = `<h2>Your Score: ${score} / ${currentQuestions.length}</h2><p>${score === currentQuestions.length ? '🎉 Perfect Score!' : 'Review the explanations above to reinforce your understanding.'}</p>`;
     scoreBoard.scrollIntoView({ behavior: 'smooth' });
 }
 </script>

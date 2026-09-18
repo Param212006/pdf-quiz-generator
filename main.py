@@ -1,12 +1,12 @@
 import os
 import json
 import io
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from groq import Groq
 from pypdf import PdfReader
+from groq import Groq
 
-app = FastAPI()
+app = FastAPI(title="PDF Quiz Generator API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,69 +16,71 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def extract_text_from_pdf(file_bytes) -> str:
-    reader = PdfReader(io.BytesIO(file_bytes))
-    text = ""
-    for page in reader.pages:
-        extracted = page.extract_text()
-        if extracted:
-            text += extracted + "\n"
-    return text
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
+
+@app.get("/")
+def read_root():
+    return {"status": "online", "message": "PDF Quiz Generator API is running"}
 
 @app.post("/api/generate-quiz")
-async def generate_quiz_api(file: UploadFile = File(...)):
+async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(20)):
+    if not client:
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY environment variable is not set.")
+
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
-    
-    contents = await file.read()
-    document_text = extract_text_from_pdf(contents)
 
-    if not document_text.strip():
-        raise HTTPException(status_code=400, detail="Could not extract text from PDF.")
+    try:
+        pdf_bytes = await file.read()
+        reader = PdfReader(io.BytesIO(pdf_bytes))
+        extracted_text = ""
+        for page in reader.pages:
+            text = page.extract_text()
+            if text:
+                extracted_text += text + "\n"
 
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=500, detail="GROQ_API_KEY environment variable is missing.")
+        if not extracted_text.strip():
+            raise HTTPException(status_code=400, detail="Could not extract text from the provided PDF.")
 
-    client = Groq(api_key=api_key)
+        prompt = f"""
+You are an expert educator. Extract key concepts from the following text and generate exactly {num_questions} multiple-choice quiz questions.
 
-    prompt = f"""
-    You are an expert exam setter. Based ONLY on the following text, generate 3 multiple-choice questions.
-    Return a valid JSON object with a key "quiz" containing an array of 3 objects.
-    Each object must have keys: "question", "options" (array of 4 strings), "answer", and "explanation".
+CRITICAL INSTRUCTION: Respond ONLY with a raw JSON array. Do not include markdown codeblocks (```json), commentary, or extra text.
 
-    --- SOURCE TEXT ---
-    {document_text[:8000]}
-    """
+JSON format expected:
+[
+  {{
+    "question": "Question string",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "answer": "Exact matching string from options array",
+    "explanation": "Short sentence explaining why this answer is correct"
+  }}
+]
 
-    models_to_try = [
-        "openai/gpt-oss-20b",
-        "openai/gpt-oss-120b",
-        "llama-3.1-8b-instant"
-    ]
-    last_exception = None
+Text Content:
+{extracted_text[:4000]}
+"""
 
-    for model_name in models_to_try:
-        try:
-            completion = client.chat.completions.create(
-                model=model_name,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.2,
-                response_format={"type": "json_object"}
-            )
-            
-            raw_output = completion.choices[0].message.content
-            parsed = json.loads(raw_output)
-            
-            if isinstance(parsed, dict):
-                quiz_data = parsed.get("quiz") or parsed.get("questions") or list(parsed.values())[0]
-            else:
-                quiz_data = parsed
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3
+        )
 
-            return {"status": "success", "quiz": quiz_data, "model_used": model_name}
-        except Exception as e:
-            last_exception = e
-            print(f"Model {model_name} failed: {e}")
-            continue
+        raw_output = response.choices[0].message.content.strip()
 
-    raise HTTPException(status_code=500, detail=str(last_exception))
+        if raw_output.startswith("```json"):
+            raw_output = raw_output[7:]
+        if raw_output.startswith("```"):
+            raw_output = raw_output[3:]
+        if raw_output.endswith("```"):
+            raw_output = raw_output[:-3]
+
+        quiz_data = json.loads(raw_output.strip())
+        return {"status": "success", "quiz": quiz_data}
+
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Failed to parse AI output into valid JSON.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
