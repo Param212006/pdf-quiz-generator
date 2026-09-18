@@ -21,12 +21,12 @@ client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 @app.get("/")
 def read_root():
-    return {"status": "online", "message": "PDF Quiz Generator API is running"}
+    return {"status": "online", "message": "PDF Quiz Generator API is live!"}
 
 @app.post("/api/generate-quiz")
 async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(20)):
     if not client:
-        raise HTTPException(status_code=500, detail="GROQ_API_KEY environment variable is not set.")
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY environment variable is not set on Render.")
 
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
