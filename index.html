@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resume-Driven Assessment Quiz</title>
+  
+  <!-- jsPDF for client-side PDF certificate generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Canvas Confetti for celebratory animation -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -127,6 +133,12 @@
   <div id="error-box"></div>
   <div id="timer-banner">⏱️ Time Remaining: <span id="timer-clock">15:00</span></div>
   <div id="score-banner"></div>
+  
+  <!-- Certificate Button (Revealed on >= 70% Score) -->
+  <button id="cert-btn" class="action-btn" style="display:none; background-color: #27ae60; margin-bottom: 20px;" onclick="generateCertificate()">
+    🎓 Download Completion Certificate (PDF)
+  </button>
+
   <div id="quiz-container"></div>
   <button id="score-btn" class="action-btn" style="display:none;" onclick="calculateScore()">Submit Quiz & Show Score</button>
 

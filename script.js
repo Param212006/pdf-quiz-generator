@@ -3,6 +3,10 @@ let timerInterval = null;
 let timeRemaining = 15 * 60;
 let matchedPdfFilename = "sample_ai.pdf";
 
+// Global Candidate Context for Certificate
+let candidateName = "Candidate";
+let passedDomain = "AI & Machine Learning";
+
 const API_BASE = "https://pdf-quiz-generator-b35g.onrender.com";
 
 function shuffleArray(array) {
@@ -31,12 +35,16 @@ document.getElementById('resume-form').addEventListener('submit', async (e) => {
 
   if (!fileInput.files[0]) return;
 
+  const uploadedFile = fileInput.files[0];
+  // Format clean candidate name from filename (e.g. "resume_ai.pdf" -> "RESUME AI")
+  candidateName = uploadedFile.name.replace(/\.pdf$/i, '').replace(/[-_]/g, ' ').toUpperCase();
+
   errorBox.style.display = 'none';
   analyzeBtn.disabled = true;
   analyzeBtn.textContent = 'Analyzing Resume...';
 
   const formData = new FormData();
-  formData.append('file', fileInput.files[0]);
+  formData.append('file', uploadedFile);
 
   try {
     const response = await fetch(`${API_BASE}/api/analyze-resume`, {
@@ -49,6 +57,7 @@ document.getElementById('resume-form').addEventListener('submit', async (e) => {
     if (data.status === 'success' && data.analysis) {
       const a = data.analysis;
       matchedPdfFilename = a.recommended_pdf;
+      passedDomain = a.detected_domain || "Technical Assessment";
 
       const skillsHTML = (a.key_skills || []).map(s => `<span class="badge">${s}</span>`).join(' ');
 
@@ -79,16 +88,17 @@ document.getElementById('generate-quiz-btn').addEventListener('click', async () 
   const genBtn = document.getElementById('generate-quiz-btn');
   const scoreBtn = document.getElementById('score-btn');
   const scoreBanner = document.getElementById('score-banner');
+  const certBtn = document.getElementById('cert-btn');
 
   errorBox.style.display = 'none';
   scoreBanner.style.display = 'none';
+  certBtn.style.display = 'none';
   scoreBtn.style.display = 'none';
   quizContainer.innerHTML = '';
   genBtn.disabled = true;
   genBtn.textContent = 'Generating Assessment Quiz...';
 
   try {
-    // Fetch matched sample PDF file
     const pdfResponse = await fetch(matchedPdfFilename);
     const pdfBlob = await pdfResponse.blob();
     const pdfFile = new File([pdfBlob], matchedPdfFilename, { type: 'application/pdf' });
@@ -199,10 +209,87 @@ function calculateScore() {
     }
   });
 
+  const percentage = Math.round((score / currentQuizData.length) * 100);
   const scoreBanner = document.getElementById('score-banner');
-  scoreBanner.textContent = `Your Assessment Score: ${score} / ${currentQuizData.length} (${Math.round((score / currentQuizData.length) * 100)}%)`;
+  scoreBanner.textContent = `Your Assessment Score: ${score} / ${currentQuizData.length} (${percentage}%)`;
   scoreBanner.style.display = 'block';
+
+  // Reveal certificate button and trigger confetti if score >= 70%
+  if (percentage >= 70) {
+    document.getElementById('cert-btn').style.display = 'block';
+    if (window.confetti) {
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+    }
+  }
   
   document.getElementById('score-btn').style.display = 'none';
   window.scrollTo({ top: scoreBanner.offsetTop - 20, behavior: 'smooth' });
+}
+
+// Generate Landscape PDF Certificate
+function generateCertificate() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    orientation: "landscape",
+    unit: "px",
+    format: [800, 600]
+  });
+
+  // Background Fill
+  doc.setFillColor(248, 249, 250);
+  doc.rect(0, 0, 800, 600, "F");
+
+  // Outer Dark Border
+  doc.setLineWidth(5);
+  doc.setDrawColor(44, 62, 80);
+  doc.rect(20, 20, 760, 560);
+
+  // Inner Accent Border
+  doc.setLineWidth(2);
+  doc.setDrawColor(52, 152, 219);
+  doc.rect(28, 28, 744, 544);
+
+  // Header Title
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(30);
+  doc.setTextColor(44, 62, 80);
+  doc.text("CERTIFICATE OF ACHIEVEMENT", 400, 110, { align: "center" });
+
+  doc.setFontSize(13);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(127, 140, 141);
+  doc.text("THIS IS PROUDLY PRESENTED TO", 400, 160, { align: "center" });
+
+  // Candidate Name
+  doc.setFontSize(26);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(41, 128, 185);
+  doc.text(candidateName, 400, 220, { align: "center" });
+
+  // Divider Line
+  doc.setLineWidth(1);
+  doc.setDrawColor(189, 195, 199);
+  doc.line(250, 240, 550, 240);
+
+  // Achievement Description
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(52, 73, 94);
+  doc.text("For successfully completing the AI-guided technical assessment in:", 400, 290, { align: "center" });
+
+  doc.setFontSize(22);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(39, 174, 96);
+  doc.text(passedDomain, 400, 330, { align: "center" });
+
+  // Issue Date & Verification Footer
+  const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(127, 140, 141);
+  doc.text(`Date Issued: ${today}`, 100, 490);
+  doc.text("Verified by: Resume Quiz Engine AI", 700, 490, { align: "right" });
+
+  doc.save(`${candidateName.replace(/\s+/g, '_')}_Certificate.pdf`);
 }
