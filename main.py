@@ -84,20 +84,15 @@ def call_groq_llm(prompt):
     return raw_output
 
 def safe_parse_json(json_str):
-    """Safely parses JSON strings even if quotes or delimiters are malformed."""
-    # Remove single line comments or markdown formatting
     clean_str = re.sub(r'```json\s*|\s*```', '', json_str).strip()
-    
     if dirtyjson:
         try:
             return dirtyjson.loads(clean_str)
         except Exception:
             pass
-
     try:
         return json.loads(clean_str)
     except json.JSONDecodeError:
-        # Fallback fix: try fixing control characters and trailing commas
         fixed_str = re.sub(r',\s*([\]}])', r'\1', clean_str)
         return json.loads(fixed_str)
 
@@ -115,11 +110,11 @@ async def analyze_resume(file: UploadFile = File(...)):
             return {"status": "error", "message": "Could not extract text from resume PDF."}
 
         prompt = f"""Analyze this candidate's resume and classify their primary expertise into ONE of these three categories:
-1. "Science & Biology"
-2. "AI & Machine Learning"
-3. "World History & Social Sciences"
+1. "Science & Biology" -> recommended_pdf: "sample.pdf"
+2. "AI & Machine Learning" -> recommended_pdf: "sample_ai.pdf"
+3. "World History & Social Sciences" -> recommended_pdf: "sample_history.pdf"
 
-CRITICAL INSTRUCTIONS: Use single quotes for any inner quotes. Return ONLY valid JSON.
+Return ONLY a valid JSON object.
 
 JSON Format:
 {{
@@ -153,7 +148,7 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
             return {"status": "error", "message": "Could not extract text from target section PDF."}
 
         prompt = f"""Generate exactly {num_questions} multiple-choice questions from this text.
-CRITICAL INSTRUCTIONS: Do not use double quotes inside string fields—use single quotes instead.
+Use single quotes inside string values.
 Return ONLY raw valid JSON array.
 
 Format:
