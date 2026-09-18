@@ -8,8 +8,8 @@ endobj
 2 0 obj
 <<
 /Type /Pages
-/Count 1
-/Kids [ 4 0 R ]
+/Count 2
+/Kids [ 4 0 R 6 0 R ]
 >>
 endobj
 3 0 obj
@@ -31,28 +31,51 @@ endobj
 5 0 obj
 <<
 /Subtype /FreeText
-/Rect [ 50 50 562 742 ]
-/Contents (Artificial Intelligence and Machine Learning Overview\012Artificial Intelligence \050AI\051 simulates human intelligence using algorithms\056\012Machine Learning models rely on training datasets to identify patterns and predict outcomes\056\012Large Language Models utilize neural networks to process natural language text\056)
-/DS (font\072 normal normal 12pt Helvetica\073text\055align\072left\073color\072\043000000)
+/Rect [ 40 40 572 752 ]
+/Contents (Artificial Intelligence \046 Machine Learning \055 Module 1\072 Foundations \046 Paradigms\012\0121\056 Artificial Intelligence vs Machine Learning vs Deep Learning\072\012Artificial Intelligence \050AI\051 refers to computer algorithms capable of executing tasks that typically demand human cognition\054 such as reasoning\054 visual perception\054 and natural language understanding\056 Machine Learning \050ML\051 is a subset of AI that uses statistical techniques to learn patterns directly from empirical datasets without explicit procedural programming\056 Deep Learning is an ML subfield based on multi\055layered Artificial Neural Networks \050ANNs\051\056\012\0122\056 Supervised and Unsupervised Learning Paradigms\072\012Supervised Learning algorithms train on labeled datasets where each input vector aligns with a target output label\056 Common tasks include classification \050e\056g\056\054 spam detection\051 and regression \050e\056g\056\054 house price forecasting\051\056 Unsupervised Learning operates on unlabeled data to identify latent patterns\054 groupings\054 or structural relationships without human guidance\056 Techniques include K\055Means Clustering\054 Hierarchical Clustering\054 and Principal Component Analysis \050PCA\051 for dimensionality reduction\056\012\0123\056 Reinforcement Learning\072\012Reinforcement Learning \050RL\051 trains an autonomous software agent inside an interactive environment using trial\055and\055error mechanisms\056 The agent observes the current state\054 selects an action\054 and receives feedback in the form of a scalar reward or penalty\056 The goal is to learn an optimal policy function that maximizes cumulative long\055term rewards over time\056 Applications include game playing \050e\056g\056\054 AlphaGo\051\054 robotics\054 and automated financial trading\056)
+/DS (font\072 normal normal 9pt Helvetica\073text\055align\072left\073color\072\043000000)
 /DA (0\0560 0\0560 0\0560 rg)
 /C [ 1 1 1 ]
 /P 4 0 R
 >>
 endobj
+6 0 obj
+<<
+/Type /Page
+/Resources <<
+>>
+/MediaBox [ 0.0 0.0 612 792 ]
+/Parent 2 0 R
+/Annots [ 7 0 R ]
+>>
+endobj
+7 0 obj
+<<
+/Subtype /FreeText
+/Rect [ 40 40 572 752 ]
+/Contents (Artificial Intelligence \046 Machine Learning \055 Module 2\072 Neural Networks \046 LLMs\012\0124\056 Deep Neural Network Architectures\072\012Artificial Neural Networks consist of an input layer\054 multiple hidden layers\054 and an output layer composed of interconnected nodes \050neurons\051\056 Each connection holds a learnable weight\054 modified iteratively during training through backpropagation and gradient descent optimization algorithms\056 Activation functions such as ReLU \050Rectified Linear Unit\051\054 Sigmoid\054 and Softmax introduce non\055linear mapping capabilities\056 Specialized architectures include Convolutional Neural Networks \050CNNs\051 for image processing and Transformers for sequential text modeling\056\012\0125\056 Large Language Models and Prompting\072\012Large Language Models \050LLMs\051 are deep learning models trained on vast text corpora using self\055attention mechanisms introduced in the Transformer architecture\056 Self\055attention enables the model to dynamically evaluate contextual dependencies between words across long distances\056 LLMs operate auto\055regressively by predicting the highest probability next token\056 Techniques like Reinforcement Learning from Human Feedback \050RLHF\051 align model responses with safety and utility guidelines\056)
+/DS (font\072 normal normal 9pt Helvetica\073text\055align\072left\073color\072\043000000)
+/DA (0\0560 0\0560 0\0560 rg)
+/C [ 1 1 1 ]
+/P 6 0 R
+>>
+endobj
 xref
-0 6
+0 8
 0000000000 65535 f 
 0000000015 00000 n 
 0000000054 00000 n 
-0000000113 00000 n 
-0000000162 00000 n 
-0000000274 00000 n 
+0000000119 00000 n 
+0000000168 00000 n 
+0000000280 00000 n 
+0000002339 00000 n 
+0000002451 00000 n 
 trailer
 <<
-/Size 6
+/Size 8
 /Root 3 0 R
 /Info 1 0 R
 >>
 startxref
-821
+3986
 %%EOF

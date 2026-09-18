@@ -8,8 +8,8 @@ endobj
 2 0 obj
 <<
 /Type /Pages
-/Count 1
-/Kids [ 4 0 R ]
+/Count 2
+/Kids [ 4 0 R 6 0 R ]
 >>
 endobj
 3 0 obj
@@ -31,28 +31,51 @@ endobj
 5 0 obj
 <<
 /Subtype /FreeText
-/Rect [ 50 50 562 742 ]
-/Contents (World History Overview\072 Modern Era\012The Industrial Revolution transformed manufacturing economies during the late 18th century\056\012The United Nations was established in 1945 to support international peace and security\056)
-/DS (font\072 normal normal 12pt Helvetica\073text\055align\072left\073color\072\043000000)
+/Rect [ 40 40 572 752 ]
+/Contents (World History \055 Module 1\072 Industrialization and WWI\012\0121\056 The Industrial Revolution\072\012The Industrial Revolution began in Great Britain during the mid\05518th century\054 transforming agrarian handicraft economies into industrial manufacturing systems\056 Key catalysts included British coal deposits\054 iron access\054 capital accumulation\054 and legal protections for private property\056 Inventions such as James Watt\047s steam engine\054 the spinning jenny\054 and mechanized looms revolutionized textile production\056 Mass urbanization followed as agricultural laborers migrated into factory towns\054 creating new social classes and labor movements\056\012\0122\056 Causes of the First World War\072\012World War I \0501914\2051918\051 was caused by four long\055term systemic factors\072 Militarism\054 Alliances\054 Imperialism\054 and Nationalism \050MAIN\051\056 Europe was divided into two major military blocks\072 the Triple Entente \050France\054 Russia\054 Great Britain\051 and the Triple Alliance \050Germany\054 Austria\055Hungary\054 Italy\051\056 The immediate catalyst was the assassination of Archduke Franz Ferdinand of Austria in Sarajevo on June 28\054 1914\054 by Gavrilo Princip\056 The crisis escalated through alliance obligations into a continent\055wide conflict\056\012\0123\056 Trench Warfare and End of WWI\072\012WWI was defined by static trench warfare along the Western Front\054 stretching across France and Belgium\056 Defensive technologies such as machine guns\054 barbed wire\054 and heavy artillery created deadly stalemates\056 Industrial warfare introduced toxic chemical gases\054 tanks\054 and combat aircraft\056 The United States entered the war in 1917 following unrestricted German submarine warfare\056 Fighting concluded with the Armistice on November 11\054 1918\054 leading to the 1919 Treaty of Versailles\056)
+/DS (font\072 normal normal 9pt Helvetica\073text\055align\072left\073color\072\043000000)
 /DA (0\0560 0\0560 0\0560 rg)
 /C [ 1 1 1 ]
 /P 4 0 R
 >>
 endobj
+6 0 obj
+<<
+/Type /Page
+/Resources <<
+>>
+/MediaBox [ 0.0 0.0 612 792 ]
+/Parent 2 0 R
+/Annots [ 7 0 R ]
+>>
+endobj
+7 0 obj
+<<
+/Subtype /FreeText
+/Rect [ 40 40 572 752 ]
+/Contents (World History \055 Module 2\072 WWII and the Post\055War Order\012\0124\056 WWII Outbreak and Global Scale\072\012World War II \0501939\2051945\051 broke out on September 1\054 1939\054 when Nazi Germany invaded Poland\054 leading Great Britain and France to declare war\056 The conflict pitted the Axis Powers \050Germany\054 Japan\054 Italy\051 against the Allied Powers \050Great Britain\054 the Soviet Union\054 the United States\054 and China\051\056 Key turning points included the Battle of Stalingrad on the Eastern Front\054 the Pacific Battle of Midway\054 and the June 6\054 1944 \050D\055Day\051 Allied invasion of Normandy\056\012\0125\056 Atomic Era and United Nations\072\012WWII concluded in Europe in May 1945 following the fall of Berlin\054 and in Asia in August 1945 after the United States dropped atomic bombs on Hiroshima and Nagasaki\056 The post\055war order established the United Nations \050UN\051 in October 1945 to foster international security and diplomatic resolution\056 Tensions between the United States and the Soviet Union soon initiated the Cold War\054 a decades\055long rivalry characterized by nuclear arms expansion and global proxy conflicts\056)
+/DS (font\072 normal normal 9pt Helvetica\073text\055align\072left\073color\072\043000000)
+/DA (0\0560 0\0560 0\0560 rg)
+/C [ 1 1 1 ]
+/P 6 0 R
+>>
+endobj
 xref
-0 6
+0 8
 0000000000 65535 f 
 0000000015 00000 n 
 0000000054 00000 n 
-0000000113 00000 n 
-0000000162 00000 n 
-0000000274 00000 n 
+0000000119 00000 n 
+0000000168 00000 n 
+0000000280 00000 n 
+0000002386 00000 n 
+0000002498 00000 n 
 trailer
 <<
-/Size 6
+/Size 8
 /Root 3 0 R
 /Info 1 0 R
 >>
 startxref
-724
+3907
 %%EOF

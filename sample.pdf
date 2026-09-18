@@ -8,8 +8,8 @@ endobj
 2 0 obj
 <<
 /Type /Pages
-/Count 1
-/Kids [ 4 0 R ]
+/Count 2
+/Kids [ 4 0 R 6 0 R ]
 >>
 endobj
 3 0 obj
@@ -31,28 +31,51 @@ endobj
 5 0 obj
 <<
 /Subtype /FreeText
-/Rect [ 50 50 562 742 ]
-/Contents (General Science and Biology Overview\012Photosynthesis is the biological process used by plants to convert light energy into chemical energy\056\012Cellular respiration breaks down glucose to produce ATP in mitochondria\056\012DNA contains the genetic instructions for the development and function of living organisms\056)
-/DS (font\072 normal normal 12pt Helvetica\073text\055align\072left\073color\072\043000000)
+/Rect [ 40 40 572 752 ]
+/Contents (General Science \046 Biology \055 Module 1\072 Cellular Biology and Genetics\012\0121\056 Cell Structure and Organelles\072\012The cell is the structural and functional unit of all living organisms\056 Prokaryotic cells lack a membrane\055bound nucleus\054 whereas eukaryotic cells contain defined organelles\056 Mitochondria generate adenosine triphosphate \050ATP\051 through cellular respiration\056 Ribosomes assemble amino acids into proteins following mRNA instructions\056 The endoplasmic reticulum exists in rough \050ribosome\055studded\051 and smooth forms\054 assisting in protein transport and lipid synthesis\056 Lysosomes contain digestive enzymes to break down waste materials\056\012\0122\056 Photosynthesis \046 Bioenergetics\072\012Photosynthesis converts solar light energy into chemical energy inside plant chloroplasts\056 Chlorophyll molecules absorb light in the blue and red wavelengths\054 reflecting green light\056 The light\055dependent reactions take place inside thylakoid membranes\054 splitting water molecules \050photolysis\051 to produce oxygen gas\054 ATP\054 and NADPH\056 The light\055independent Calvin cycle takes place in the stroma\054 utilizing carbon dioxide and energy molecules to synthesize glucose \050C6H12O6\051\056\012\0123\056 Molecular Genetics \046 DNA Replication\072\012DNA \050Deoxyribonucleic acid\051 stores genetic instructions in a double\055helix structure composed of nucleotides\056 Each nucleotide contains a phosphate group\054 a deoxyribose sugar\054 and one of four nitrogenous bases\072 Adenine \050A\051\054 Thymine \050T\051\054 Cytosine \050C\051\054 or Guanine \050G\051\056 Adenine bonds with Thymine via two hydrogen bonds\054 while Cytosine pairs with Guanine via three\056 During DNA replication\054 DNA helicase unwinds the double strand\054 and DNA polymerase synthesizes a complementary daughter strand in the 5\047 to 3\047 direction\056)
+/DS (font\072 normal normal 9pt Helvetica\073text\055align\072left\073color\072\043000000)
 /DA (0\0560 0\0560 0\0560 rg)
 /C [ 1 1 1 ]
 /P 4 0 R
 >>
 endobj
+6 0 obj
+<<
+/Type /Page
+/Resources <<
+>>
+/MediaBox [ 0.0 0.0 612 792 ]
+/Parent 2 0 R
+/Annots [ 7 0 R ]
+>>
+endobj
+7 0 obj
+<<
+/Subtype /FreeText
+/Rect [ 40 40 572 752 ]
+/Contents (General Science \046 Biology \055 Module 2\072 Human Systems and Ecology\012\0124\056 Human Circulatory \046 Respiratory Systems\072\012The human circulatory system operates via a closed double loop consisting of the systemic and pulmonary circuits\056 The four\055chambered heart pumps deoxygenated blood from the right ventricle into the pulmonary artery toward the lungs\056 Oxygenated blood returns via pulmonary veins to the left atrium\054 passing into the left ventricle\054 which pumps it through the aorta to body tissues\056 Red blood cells \050erythrocytes\051 utilize hemoglobin to bind oxygen\054 while white blood cells \050leukocytes\051 manage immune defenses\056\012\0125\056 Ecological Structures and Food Webs\072\012Ecosystems consist of biotic biological communities interacting with abiotic environmental factors\056 Trophic hierarchies organize energy transfer\072 Primary producers \050autotrophs\051 synthesize biomass\054 primary consumers \050herbivores\051 consume autotrophs\054 and secondary\057tertiary consumers \050carnivores\051 prey on lower levels\056 Decomposers recycle dead organic matter into nutrients\056 Only roughly 10 percent of energy transfers from one trophic level to the next\054 limiting food chain length\056)
+/DS (font\072 normal normal 9pt Helvetica\073text\055align\072left\073color\072\043000000)
+/DA (0\0560 0\0560 0\0560 rg)
+/C [ 1 1 1 ]
+/P 6 0 R
+>>
+endobj
 xref
-0 6
+0 8
 0000000000 65535 f 
 0000000015 00000 n 
 0000000054 00000 n 
-0000000113 00000 n 
-0000000162 00000 n 
-0000000274 00000 n 
+0000000119 00000 n 
+0000000168 00000 n 
+0000000280 00000 n 
+0000002418 00000 n 
+0000002530 00000 n 
 trailer
 <<
-/Size 6
+/Size 8
 /Root 3 0 R
 /Info 1 0 R
 >>
 startxref
-816
+4010
 %%EOF
