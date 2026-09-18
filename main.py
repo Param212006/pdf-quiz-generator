@@ -21,6 +21,13 @@ app.add_middleware(
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
+# Candidate models ordered by speed and availability
+CANDIDATE_MODELS = [
+    "llama-3.1-8b-instant",
+    "llama-3.3-70b-versatile",
+    "mixtral-8x7b-32768"
+]
+
 @app.get("/")
 def read_root():
     return {"status": "online", "message": "PDF Quiz Generator API is live!"}
@@ -34,6 +41,7 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
         pdf_bytes = await file.read()
         extracted_text = ""
 
+        # Primary extraction: pypdf
         try:
             reader = PdfReader(io.BytesIO(pdf_bytes))
             for page in reader.pages:
@@ -43,6 +51,7 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
         except Exception:
             extracted_text = ""
 
+        # Fallback extraction: pdfplumber
         if not extracted_text.strip():
             with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
                 for page in pdf.pages:
@@ -69,14 +78,26 @@ Format:
 Text:
 {extracted_text[:2500]}"""
 
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.2,
-            max_tokens=2000
-        )
+        raw_output = None
+        last_error = None
 
-        raw_output = response.choices[0].message.content.strip()
+        # Sequentially try models until one succeeds
+        for model_name in CANDIDATE_MODELS:
+            try:
+                response = client.chat.completions.create(
+                    model=model_name,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.2,
+                    max_tokens=2000
+                )
+                raw_output = response.choices[0].message.content.strip()
+                break
+            except Exception as err:
+                last_error = err
+                continue
+
+        if not raw_output:
+            return {"status": "error", "message": f"Groq Error: {str(last_error)}"}
 
         match = re.search(r'\[.*\]', raw_output, re.DOTALL)
         if match:
