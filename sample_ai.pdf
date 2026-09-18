@@ -32,7 +32,7 @@ endobj
 <<
 /Subtype /FreeText
 /Rect [ 50 50 562 742 ]
-/Contents (General Science and Biology Overview\012Photosynthesis is the biological process used by plants to convert light energy into chemical energy\056\012Cellular respiration breaks down glucose to produce ATP in mitochondria\056\012DNA contains the genetic instructions for the development and function of living organisms\056)
+/Contents (Artificial Intelligence and Machine Learning Overview\012Artificial Intelligence \050AI\051 simulates human intelligence using algorithms\056\012Machine Learning models rely on training datasets to identify patterns and predict outcomes\056\012Large Language Models utilize neural networks to process natural language text\056)
 /DS (font\072 normal normal 12pt Helvetica\073text\055align\072left\073color\072\043000000)
 /DA (0\0560 0\0560 0\0560 rg)
 /C [ 1 1 1 ]
@@ -54,5 +54,5 @@ trailer
 /Info 1 0 R
 >>
 startxref
-816
+821
 %%EOF
