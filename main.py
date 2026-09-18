@@ -21,11 +21,10 @@ app.add_middleware(
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
-# Candidate models ordered by speed and availability
-CANDIDATE_MODELS = [
-    "llama-3.1-8b-instant",
+# Active production models on Groq
+ACTIVE_MODELS = [
     "llama-3.3-70b-versatile",
-    "mixtral-8x7b-32768"
+    "llama-3.1-8b-instant"
 ]
 
 @app.get("/")
@@ -81,8 +80,7 @@ Text:
         raw_output = None
         last_error = None
 
-        # Sequentially try models until one succeeds
-        for model_name in CANDIDATE_MODELS:
+        for model_name in ACTIVE_MODELS:
             try:
                 response = client.chat.completions.create(
                     model=model_name,
@@ -91,7 +89,8 @@ Text:
                     max_tokens=2000
                 )
                 raw_output = response.choices[0].message.content.strip()
-                break
+                if raw_output:
+                    break
             except Exception as err:
                 last_error = err
                 continue
