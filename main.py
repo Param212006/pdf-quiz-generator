@@ -27,7 +27,7 @@ def read_root():
 @app.post("/api/generate-quiz")
 async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(20)):
     if not client:
-        raise HTTPException(status_code=500, detail="GROQ_API_KEY environment variable is not set on Render.")
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY environment variable is missing on Render.")
 
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
@@ -42,10 +42,10 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
                 extracted_text += text + "\n"
 
         if not extracted_text.strip():
-            raise HTTPException(status_code=400, detail="Could not extract text from the provided PDF.")
+            raise HTTPException(status_code=400, detail="Could not extract text from PDF.")
 
         prompt = f"""You are an educator. Generate exactly {num_questions} multiple-choice questions from this text.
-Return ONLY a valid JSON array. No markdown, no triple backticks, no explanatory text.
+Return ONLY a valid JSON array. No markdown codeblocks, no extra text.
 
 Format:
 [
@@ -58,7 +58,7 @@ Format:
 ]
 
 Text:
-{extracted_text[:2500]}"""
+{extracted_text[:2000]}"""
 
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
@@ -75,9 +75,9 @@ Text:
             quiz_data = json.loads(clean_json)
             return {"status": "success", "quiz": quiz_data}
         else:
-            raise HTTPException(status_code=500, detail="AI output did not contain a valid JSON array.")
+            raise HTTPException(status_code=500, detail="Groq response did not contain a JSON array.")
 
     except json.JSONDecodeError as e:
-        raise HTTPException(status_code=500, detail=f"JSON Parse Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"JSON Decode Error: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Backend Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Backend Exception: {str(e)}")
