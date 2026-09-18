@@ -34,7 +34,6 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
         pdf_bytes = await file.read()
         extracted_text = ""
 
-        # Primary extraction: pypdf
         try:
             reader = PdfReader(io.BytesIO(pdf_bytes))
             for page in reader.pages:
@@ -44,7 +43,6 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
         except Exception:
             extracted_text = ""
 
-        # Fallback extraction: pdfplumber
         if not extracted_text.strip():
             with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
                 for page in pdf.pages:
@@ -69,11 +67,10 @@ Format:
 ]
 
 Text:
-{extracted_text[:2000]}"""
+{extracted_text[:2500]}"""
 
-        # Updated to active production model endpoint on Groq
         response = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+            model="llama-3.1-8b-instant",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2,
             max_tokens=2000

@@ -36,7 +36,7 @@
       font-weight: 600;
     }
     .sample-btn:hover { background: #d0d7de; }
-    button[type="submit"] {
+    button.action-btn {
       width: 100%;
       background: #3498db;
       color: white;
@@ -46,8 +46,35 @@
       border-radius: 5px;
       cursor: pointer;
       font-weight: bold;
+      margin-top: 10px;
     }
-    button[type="submit"]:disabled { background: #bdc3c7; }
+    button.action-btn:disabled { background: #bdc3c7; }
+    #timer-banner {
+      display: none;
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+      background: #2c3e50;
+      color: #ecf0f1;
+      text-align: center;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+      margin-bottom: 20px;
+    }
+    #score-banner {
+      display: none;
+      background: #27ae60;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
     #error-box {
       background: #f8d7da;
       color: #721c24;
@@ -63,13 +90,17 @@
       border-radius: 6px;
       border-left: 4px solid #3498db;
     }
-    .options-group { margin-top: 10px; }
     .option-label {
       display: block;
       margin-bottom: 8px;
+      padding: 8px;
+      border-radius: 4px;
       cursor: pointer;
     }
+    .option-label.correct { background: #d4edda; color: #155724; font-weight: bold; }
+    .option-label.incorrect { background: #f8d7da; color: #721c24; }
     .explanation {
+      display: none;
       margin-top: 10px;
       padding: 10px;
       background: #eef9f1;
@@ -92,13 +123,16 @@
 
     <form id="quiz-form">
       <input type="file" id="pdf-file" accept=".pdf" required />
-      <br><br>
-      <button type="submit" id="submit-btn">Generate 20-Question Quiz</button>
+      <br>
+      <button type="submit" id="submit-btn" class="action-btn">Generate 20-Question Quiz</button>
     </form>
     <div id="error-box"></div>
   </div>
 
+  <div id="timer-banner">⏱️ Time Remaining: <span id="timer-clock">15:00</span></div>
+  <div id="score-banner"></div>
   <div id="quiz-container"></div>
+  <button id="score-btn" class="action-btn" style="display:none;" onclick="calculateScore()">Submit Quiz & Show Score</button>
 
   <script src="script.js"></script>
 </body>
