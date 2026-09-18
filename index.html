@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Quiz Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #0F172A;
+            --card-bg: #1E293B;
+            --text-color: #F8FAFC;
+            --accent-green: #22C55E;
+            --accent-red: #EF4444;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: #FFFFFF;
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #94A3B8;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .upload-box {
+            border: 2px dashed var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            background: #0F172A;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #334155;
+            color: #F8FAFC;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .file-label:hover {
+            background: #475569;
+        }
+
+        #fileName {
+            display: block;
+            margin-top: 10px;
+            color: #94A3B8;
+            font-size: 0.85rem;
+        }
+
+        button.btn-primary {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .question-card {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: #0F172A;
+        }
+
+        .option-item {
+            margin: 10px 0;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .option-item:hover {
+            border-color: var(--primary);
+        }
+
+        .option-item input {
+            margin-right: 12px;
+            accent-color: var(--primary);
+        }
+
+        .option-item.correct {
+            border-color: var(--accent-green) !important;
+            background: rgba(34, 197, 94, 0.15) !important;
+            color: var(--accent-green);
+        }
+
+        .option-item.wrong {
+            border-color: var(--accent-red) !important;
+            background: rgba(239, 68, 68, 0.15) !important;
+            color: var(--accent-red);
+        }
+
+        .explanation {
+            margin-top: 12px;
+            padding: 10px;
+            background: #1E293B;
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #CBD5E1;
+            display: none;
+        }
+
+        #scoreBoard {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: rgba(79, 70, 229, 0.2);
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>PDF Quiz Generator</h1>
+    <p class="subtitle">Upload any document and test your knowledge instantly.</p>
+    
+    <form id="quizForm">
+        <div class="upload-box">
+            <label for="pdfFile" class="file-label">Choose PDF File</label>
+            <input type="file" id="pdfFile" accept="application/pdf" required>
+            <span id="fileName">No file chosen</span>
+        </div>
+        <button type="submit" id="submitBtn" class="btn-primary">Generate Interactive Quiz</button>
+    </form>
+
+    <div id="result" style="margin-top: 25px;"></div>
+    <div id="scoreBoard"></div>
+</div>
+
+<script>
+let currentQuestions = [];
+
+document.getElementById('pdfFile').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    document.getElementById('fileName').innerText = file ? file.name : "No file chosen";
+});
+
+document.getElementById('quizForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const fileInput = document.getElementById('pdfFile');
+    const resultDiv = document.getElementById('result');
+    const submitBtn = document.getElementById('submitBtn');
+    const scoreBoard = document.getElementById('scoreBoard');
+    
+    if (!fileInput.files[0]) return alert("Please select a PDF file.");
+
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Extracting text and generating quiz...";
+    resultDiv.innerHTML = "";
+    scoreBoard.style.display = "none";
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    try {
+        const response = await fetch('http://localhost:8000/api/generate-quiz', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.status === "success") {
+            currentQuestions = data.quiz;
+            renderQuiz(currentQuestions);
+        } else {
+            resultDiv.innerHTML = `<p style="color: var(--accent-red);">Error: ${data.message || "Failed to generate quiz."}</p>`;
+        }
+    } catch (err) {
+        console.error(err);
+        resultDiv.innerHTML = `<p style="color: var(--accent-red);">Could not connect to backend server at http://localhost:8000.</p>`;
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Generate Interactive Quiz";
+    }
+});
+
+function renderQuiz(questions) {
+    const resultDiv = document.getElementById('result');
+    let html = `<form id="interactiveQuizForm">`;
+
+    questions.forEach((q, idx) => {
+        html += `
+            <div class="question-card" id="q-block-${idx}">
+                <p style="font-weight: 600; margin-bottom: 15px;">Q${idx + 1}: ${q.question}</p>
+                <div>
+                    ${q.options.map((opt, optIdx) => `
+                        <label class="option-item" id="opt-label-${idx}-${optIdx}">
+                            <input type="radio" name="question-${idx}" value="${opt.replace(/"/g, '&quot;')}" required>
+                            <span>${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="explanation" id="explanation-${idx}">
+                    <strong>Explanation:</strong> ${q.explanation}
+                </div>
+            </div>
+        `;
+    });
+
+    html += `<button type="submit" class="btn-primary" style="margin-top: 20px; background-color: var(--accent-green);">Submit Answers</button></form>`;
+    resultDiv.innerHTML = html;
+
+    document.getElementById('interactiveQuizForm').addEventListener('submit', handleQuizSubmit);
+}
+
+function handleQuizSubmit(e) {
+    e.preventDefault();
+    let score = 0;
+
+    currentQuestions.forEach((q, idx) => {
+        const selected = document.querySelector(`input[name="question-${idx}"]:checked`);
+        const userAns = selected ? selected.value : null;
+
+        q.options.forEach((opt, optIdx) => {
+            const labelEl = document.getElementById(`opt-label-${idx}-${optIdx}`);
+            const inputEl = labelEl.querySelector('input');
+            inputEl.disabled = true;
+
+            if (opt === q.answer) {
+                labelEl.classList.add('correct');
+            } else if (userAns === opt && userAns !== q.answer) {
+                labelEl.classList.add('wrong');
+            }
+        });
+
+        if (userAns === q.answer) score++;
+        document.getElementById(`explanation-${idx}`).style.display = "block";
+    });
+
+    const scoreBoard = document.getElementById('scoreBoard');
+    scoreBoard.style.display = "block";
+    scoreBoard.innerHTML = `<h2>Your Score: ${score} / ${currentQuestions.length}</h2><p>${score === currentQuestions.length ? '🎉 Excellent performance!' : 'Review the explanations above to reinforce learning.'}</p>`;
+    scoreBoard.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
