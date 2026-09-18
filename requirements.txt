@@ -4,3 +4,4 @@ pypdf
 pdfplumber
 groq
 python-multipart
+dirtyjson

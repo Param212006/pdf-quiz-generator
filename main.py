@@ -8,6 +8,11 @@ from pypdf import PdfReader
 import pdfplumber
 from groq import Groq
 
+try:
+    import dirtyjson
+except ImportError:
+    dirtyjson = None
+
 app = FastAPI(title="Resume-Based PDF Quiz Generator API")
 
 app.add_middleware(
@@ -63,8 +68,8 @@ def call_groq_llm(prompt):
             response = client.chat.completions.create(
                 model=model_id,
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.2,
-                max_tokens=2000
+                temperature=0.1,
+                max_tokens=2500
             )
             raw_output = response.choices[0].message.content.strip()
             if raw_output:
@@ -77,6 +82,24 @@ def call_groq_llm(prompt):
         raise Exception(f"Groq API Error: {str(last_error)}")
 
     return raw_output
+
+def safe_parse_json(json_str):
+    """Safely parses JSON strings even if quotes or delimiters are malformed."""
+    # Remove single line comments or markdown formatting
+    clean_str = re.sub(r'```json\s*|\s*```', '', json_str).strip()
+    
+    if dirtyjson:
+        try:
+            return dirtyjson.loads(clean_str)
+        except Exception:
+            pass
+
+    try:
+        return json.loads(clean_str)
+    except json.JSONDecodeError:
+        # Fallback fix: try fixing control characters and trailing commas
+        fixed_str = re.sub(r',\s*([\]}])', r'\1', clean_str)
+        return json.loads(fixed_str)
 
 @app.get("/")
 def read_root():
@@ -96,12 +119,14 @@ async def analyze_resume(file: UploadFile = File(...)):
 2. "AI & Machine Learning"
 3. "World History & Social Sciences"
 
-Return ONLY a valid JSON object without markdown formatting or code blocks:
+CRITICAL INSTRUCTIONS: Use single quotes for any inner quotes. Return ONLY valid JSON.
+
+JSON Format:
 {{
   "detected_domain": "AI & Machine Learning",
   "key_skills": ["Python", "FastAPI", "Machine Learning"],
   "recommended_pdf": "sample_ai.pdf",
-  "reasoning": "Candidate shows strong background in software and machine learning."
+  "reasoning": "Candidate shows background in software and machine learning."
 }}
 
 Resume Content:
@@ -110,7 +135,7 @@ Resume Content:
         raw_response = call_groq_llm(prompt)
         match = re.search(r'\{.*\}', raw_response, re.DOTALL)
         if match:
-            analysis = json.loads(match.group(0))
+            analysis = safe_parse_json(match.group(0))
             return {"status": "success", "analysis": analysis}
         else:
             return {"status": "error", "message": "Failed to parse resume analysis response."}
@@ -128,7 +153,8 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
             return {"status": "error", "message": "Could not extract text from target section PDF."}
 
         prompt = f"""Generate exactly {num_questions} multiple-choice questions from this text.
-Return ONLY a valid raw JSON array. Do not include markdown codeblocks or commentary.
+CRITICAL INSTRUCTIONS: Do not use double quotes inside string fields—use single quotes instead.
+Return ONLY raw valid JSON array.
 
 Format:
 [
@@ -146,7 +172,7 @@ Text:
         raw_output = call_groq_llm(prompt)
         match = re.search(r'\[.*\]', raw_output, re.DOTALL)
         if match:
-            quiz_data = json.loads(match.group(0))
+            quiz_data = safe_parse_json(match.group(0))
             return {"status": "success", "quiz": quiz_data}
         else:
             return {"status": "error", "message": "AI quiz response formatting error."}
