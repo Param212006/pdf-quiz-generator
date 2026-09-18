@@ -2,7 +2,7 @@ import os
 import json
 import io
 import re
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
 import pdfplumber
@@ -19,7 +19,7 @@ app.add_middleware(
 )
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
+client = Groq(api_api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 @app.get("/")
 def read_root():
@@ -28,7 +28,7 @@ def read_root():
 @app.post("/api/generate-quiz")
 async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(20)):
     if not client:
-        return {"status": "error", "message": "GROQ_API_KEY is not configured on Render."}
+        return {"status": "error", "message": "GROQ_API_KEY is missing on Render."}
 
     try:
         pdf_bytes = await file.read()
@@ -53,7 +53,7 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
                         extracted_text += text + "\n"
 
         if not extracted_text.strip():
-            return {"status": "error", "message": "Could not extract text from PDF. Ensure the file contains readable digital text."}
+            return {"status": "error", "message": "Could not extract text from PDF."}
 
         prompt = f"""Generate exactly {num_questions} multiple-choice questions from this text.
 Return ONLY a valid raw JSON array. Do not include markdown codeblocks, commentary, or backticks.
@@ -71,8 +71,9 @@ Format:
 Text:
 {extracted_text[:2000]}"""
 
+        # Updated active Groq model identifier
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2,
             max_tokens=2000
