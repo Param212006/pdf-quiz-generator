@@ -1,6 +1,7 @@
 import os
 import json
 import io
+import re
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
@@ -43,44 +44,40 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
         if not extracted_text.strip():
             raise HTTPException(status_code=400, detail="Could not extract text from the provided PDF.")
 
-        prompt = f"""
-You are an expert educator. Extract key concepts from the following text and generate exactly {num_questions} multiple-choice quiz questions.
+        prompt = f"""You are an educator. Generate exactly {num_questions} multiple-choice questions from this text.
+Return ONLY a valid JSON array. No markdown, no triple backticks, no explanatory text.
 
-CRITICAL INSTRUCTION: Respond ONLY with a raw JSON array. Do not include markdown codeblocks (```json), commentary, or extra text.
-
-JSON format expected:
+Format:
 [
   {{
-    "question": "Question string",
-    "options": ["Option A", "Option B", "Option C", "Option D"],
-    "answer": "Exact matching string from options array",
-    "explanation": "Short sentence explaining why this answer is correct"
+    "question": "Question text",
+    "options": ["Opt A", "Opt B", "Opt C", "Opt D"],
+    "answer": "Opt A",
+    "explanation": "Short reason"
   }}
 ]
 
-Text Content:
-{extracted_text[:4000]}
-"""
+Text:
+{extracted_text[:2500]}"""
 
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.3
+            temperature=0.2,
+            max_tokens=2000
         )
 
         raw_output = response.choices[0].message.content.strip()
 
-        if raw_output.startswith("```json"):
-            raw_output = raw_output[7:]
-        if raw_output.startswith("```"):
-            raw_output = raw_output[3:]
-        if raw_output.endswith("```"):
-            raw_output = raw_output[:-3]
+        match = re.search(r'\[.*\]', raw_output, re.DOTALL)
+        if match:
+            clean_json = match.group(0)
+            quiz_data = json.loads(clean_json)
+            return {"status": "success", "quiz": quiz_data}
+        else:
+            raise HTTPException(status_code=500, detail="AI output did not contain a valid JSON array.")
 
-        quiz_data = json.loads(raw_output.strip())
-        return {"status": "success", "quiz": quiz_data}
-
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail="Failed to parse AI output into valid JSON.")
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=500, detail=f"JSON Parse Error: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Backend Error: {str(e)}")
